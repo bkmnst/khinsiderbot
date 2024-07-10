@@ -25,8 +25,9 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def download(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat_id = update.effective_chat.id
+    user_id = update.effective_user.id
     album_id = update.message.text
-    download_directory = "./download/"
+    download_directory = f"./{user_id}/"
     await context.bot.send_message(chat_id=chat_id, text="Starting download...")
     try:
         khinsider.download(
@@ -53,7 +54,7 @@ async def download(update: Update, context: ContextTypes.DEFAULT_TYPE):
     for filename in downloaded_files:
         if filename.endswith(".mp3"):
             mp3_files_list.append(filename)
-    
+
     groups = [
         mp3_files_list[i : i + max_files_per_group]
         for i in range(0, len(mp3_files_list), max_files_per_group)
