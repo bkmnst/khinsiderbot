@@ -1,6 +1,9 @@
 import logging
 import os
 import khinsider
+from mutagen.mp3 import MP3
+from mutagen.id3 import ID3, APIC
+import mimetypes
 from telegram import Update, InputMediaAudio
 from telegram.ext import (
     ApplicationBuilder,
@@ -53,7 +56,18 @@ async def download(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     for filename in downloaded_files:
         if filename.endswith(".mp3"):
-            mp3_files_list.append(filename)
+            mp3_files_list.append(os.path.join(download_directory, filename))
+        if filename.endswith(".jpg") or filename.endswith(".png"):
+            cover_filename = os.path.join(download_directory, filename)
+
+    if "cover_filename" in locals():
+        mime_type, _ = mimetypes.guess_type(cover_filename)
+        for mp3_file in mp3_files_list:
+            audio = MP3(mp3_file, ID3=ID3)
+
+            with open(cover_filename, "rb") as img:
+                audio.tags.add(APIC(mime=mime_type, type=3, data=img.read()))
+            audio.save()
 
     groups = [
         mp3_files_list[i : i + max_files_per_group]
@@ -63,8 +77,7 @@ async def download(update: Update, context: ContextTypes.DEFAULT_TYPE):
     for group in groups:
         media_list = []
         for filename in group:
-            file_path = os.path.join(download_directory, filename)
-            media_instance = InputMediaAudio(media=open(file_path, "rb"))
+            media_instance = InputMediaAudio(media=open(filename, "rb"))
             media_list.append(media_instance)
         await context.bot.send_media_group(chat_id=chat_id, media=media_list)
 
