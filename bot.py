@@ -15,7 +15,7 @@ from telegram.ext import (
 
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 logging.basicConfig(
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.DEBUG
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
 )
 
 
@@ -80,6 +80,8 @@ async def download(update: Update, context: ContextTypes.DEFAULT_TYPE):
             media_instance = InputMediaAudio(media=open(filename, "rb"))
             media_list.append(media_instance)
         await context.bot.send_media_group(chat_id=chat_id, media=media_list)
+    await context.bot.send_message(chat_id=chat_id, text="Done!")
+    os.system(f"rm -rf {download_directory}")
 
 
 if __name__ == "__main__":
