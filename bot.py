@@ -17,25 +17,29 @@ logging.basicConfig(
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    chat_id = update.effective_chat.id
     await context.bot.send_message(
-        chat_id=update.effective_chat.id, text="Please, send a khinsider album ID."
+        chat_id=chat_id, text="Please, send a khinsider album ID."
     )
 
 
 async def download(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    chat_id = update.effective_chat.id
     album_id = update.message.text
-    await context.bot.send_message(
-        chat_id=update.effective_chat.id, text="Starting download..."
-    )
+    await context.bot.send_message(chat_id=chat_id, text="Starting download...")
     try:
         khinsider.download(
             album_id, path="./download", makeDirs=True, formatOrder=None, verbose=True
         )
     except khinsider.NonexistentSoundtrackError:
         await context.bot.send_message(
-            chat_id=update.effective_chat.id,
+            chat_id=chat_id,
             text=f"Soundtrack '{album_id}' doesn't exist.",
         )
+    await context.bot.send_message(
+        chat_id=chat_id, text="Download finished! Uploading files..."
+    )
+    await context.bot.send_media_group
 
 
 if __name__ == "__main__":
