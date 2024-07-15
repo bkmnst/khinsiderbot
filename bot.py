@@ -12,6 +12,9 @@ from telegram.ext import (
     MessageHandler,
     filters,
 )
+from dotenv import load_dotenv
+
+load_dotenv()
 
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 logging.basicConfig(
@@ -40,14 +43,14 @@ async def download(update: Update, context: ContextTypes.DEFAULT_TYPE):
             formatOrder=None,
             verbose=True,
         )
+        await context.bot.send_message(
+            chat_id=chat_id, text="Download finished! Uploading files..."
+        )
     except khinsider.NonexistentSoundtrackError:
         await context.bot.send_message(
             chat_id=chat_id,
             text=f"Soundtrack '{album_id}' doesn't exist.",
         )
-    await context.bot.send_message(
-        chat_id=chat_id, text="Download finished! Uploading files..."
-    )
 
     mp3_files_list = []
     max_files_per_group = 10
